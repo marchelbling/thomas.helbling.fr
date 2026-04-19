@@ -1,0 +1,5 @@
+app/node_modules/
+app/dist/
+app/scripts/.piper-models/
+public/js/
+docs/
