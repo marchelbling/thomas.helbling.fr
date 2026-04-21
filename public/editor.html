@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Éditeur — Révisions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="vendor/katex.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: #fafaf8;
+      color: #111827;
+      padding: 2rem 1rem 4rem;
+      -webkit-font-smoothing: antialiased;
+    }
+    #app { max-width: 60rem; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #004170, #ed1c8f, #da291c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    h2 { font-size: 1.1rem; font-weight: 600; color: #374151; margin-bottom: 0.75rem; }
+    .section {
+      background: white;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .toolbar {
+      display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;
+    }
+    button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: white;
+      color: #374151;
+      cursor: pointer;
+    }
+    button:hover { background: #f3f4f6; }
+    button.primary { background: #004170; color: white; border-color: #004170; }
+    button.primary:hover { background: #002a4d; }
+    button.danger { color: #da291c; border-color: #fecaca; }
+    button.danger:hover { background: #fef2f2; }
+    button.small { font-size: 0.85rem; padding: 0.3rem 0.6rem; }
+    .field {
+      display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem;
+    }
+    .field.inline { flex-direction: row; align-items: center; gap: 0.5rem; }
+    .field > span { font-size: 0.85rem; color: #6b7280; font-weight: 600; }
+    input[type="text"], input:not([type]), textarea {
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: white;
+      width: 100%;
+    }
+    textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    input:focus, textarea:focus { outline: 2px solid #004170; outline-offset: -1px; border-color: transparent; }
+    .md-preview {
+      margin-top: 0.4rem;
+      padding: 0.6rem 0.8rem;
+      background: #f3f4f6;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #374151;
+      min-height: 2rem;
+    }
+    .md-preview p { margin: 0.3rem 0; }
+    .md-preview p:first-child { margin-top: 0; }
+    .md-preview p:last-child { margin-bottom: 0; }
+    .muted { color: #9ca3af; }
+    .lesson-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #fbfbfa;
+    }
+    .lesson-header {
+      display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem;
+    }
+    .lesson-name { flex: 1; font-weight: 600; }
+    .cards { display: flex; flex-direction: column; gap: 0.4rem; margin: 0.75rem 0; }
+    .card-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr auto;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .json-preview {
+      background: #1f2937;
+      color: #f3f4f6;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem;
+      max-height: 24rem;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 640px) {
+      .card-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="vendor/katex.min.js"></script>
+  <script src="vendor/marked.min.js"></script>
+  <script src="vendor/marked-katex.min.js"></script>
+  <script type="module" src="js/editor.js"></script>
+</body>
+</html>

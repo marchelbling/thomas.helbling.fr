@@ -3,11 +3,13 @@ export type Direction = 'key-to-value' | 'value-to-key';
 export interface Card {
   readonly key: readonly string[];
   readonly value: readonly string[];
+  readonly note?: string;
 }
 
 export interface Lesson {
   readonly name: string;
   readonly cards: readonly Card[];
+  readonly notes?: string;
 }
 
 export interface Curriculum {
@@ -39,10 +41,12 @@ export interface GameState {
 export interface RawCard {
   readonly key: string | readonly string[];
   readonly value: string | readonly string[];
+  readonly note?: string;
 }
 export interface RawLesson {
   readonly name: string;
   readonly cards: readonly RawCard[];
+  readonly notes?: string;
 }
 export interface RawCurriculum {
   readonly curriculum: string;

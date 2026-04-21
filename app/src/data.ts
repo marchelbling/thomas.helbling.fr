@@ -17,7 +17,12 @@ export function parseCurriculum(raw: RawCurriculum): Curriculum {
     piperVoice: raw.piperVoice,
     lessons: raw.lessons.map(l => ({
       name: l.name,
-      cards: l.cards.map(c => ({ key: toArray(c.key), value: toArray(c.value) })),
+      notes: l.notes,
+      cards: l.cards.map(c => ({
+        key: toArray(c.key),
+        value: toArray(c.value),
+        ...(c.note !== undefined ? { note: c.note } : {}),
+      })),
     })),
   };
 }

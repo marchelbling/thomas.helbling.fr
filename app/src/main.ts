@@ -5,6 +5,7 @@ import {
   markFailed, prompt,
 } from './game.js';
 import type { Card, Curriculum, GameState, Lesson } from './types.js';
+import { renderMarkdown } from './markdown.js';
 
 const CURRICULA: readonly { key: string; label: string }[] = [
   { key: 'english', label: 'Anglais' },
@@ -88,7 +89,7 @@ function renderLessonPicker(): void {
     list.appendChild(lessonRow(
       lesson.name,
       () => startSession(lesson.cards),
-      () => renderReview(lesson.name, lesson.cards),
+      () => renderReview(lesson.name, lesson.cards, lesson.notes),
     ));
   }
   screenEl.appendChild(list);
@@ -118,12 +119,19 @@ function lessonRow(name: string, onPlay: () => void, onReview: () => void): HTML
   return row;
 }
 
-function renderReview(title: string, cards: readonly Card[]): void {
+function renderReview(title: string, cards: readonly Card[], notes?: string): void {
   clear();
   const h = document.createElement('h1');
   h.className = 'title';
   h.textContent = title;
   screenEl.appendChild(h);
+
+  if (notes && notes.trim() !== '') {
+    const notesEl = document.createElement('div');
+    notesEl.className = 'lesson-notes';
+    notesEl.innerHTML = renderMarkdown(notes);
+    screenEl.appendChild(notesEl);
+  }
 
   const table = document.createElement('div');
   table.className = 'review-list';
@@ -140,6 +148,12 @@ function renderReview(title: string, cards: readonly Card[]): void {
     v.className = 'review-value';
     v.textContent = card.value.join(' / ');
     row.append(k, sep, v);
+    if (card.note && card.note.trim() !== '') {
+      const note = document.createElement('div');
+      note.className = 'card-note';
+      note.innerHTML = renderMarkdown(card.note);
+      row.appendChild(note);
+    }
     table.appendChild(row);
   }
   screenEl.appendChild(table);
