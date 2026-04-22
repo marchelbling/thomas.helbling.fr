@@ -1,5 +1,6 @@
 import type { RawCard, RawCurriculum, RawLesson } from './types.js';
 import { renderMarkdown } from './markdown.js';
+import { CURRICULA } from './curricula.js';
 
 interface EditCard {
   key: string;
@@ -195,7 +196,27 @@ function renderToolbar(): HTMLElement {
     render();
   });
 
-  return h('div', { className: 'toolbar' }, [loadBtn, fileInput, newBtn, downloadBtn]);
+  const remoteSelect = h('select') as HTMLSelectElement;
+  remoteSelect.append(h('option', { value: '' }, ['Charger depuis le site…']));
+  for (const c of CURRICULA) {
+    remoteSelect.append(h('option', { value: c.key }, [c.label]));
+  }
+  remoteSelect.addEventListener('change', async () => {
+    const key = remoteSelect.value;
+    if (!key) return;
+    try {
+      const res = await fetch(`/${key}/data.json`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const raw = await res.json() as RawCurriculum;
+      Object.assign(state, fromRaw(raw));
+      render();
+    } catch (err) {
+      alert('Chargement impossible : ' + (err as Error).message);
+      remoteSelect.value = '';
+    }
+  });
+
+  return h('div', { className: 'toolbar' }, [loadBtn, fileInput, remoteSelect, newBtn, downloadBtn]);
 }
 
 function renderMeta(): HTMLElement {

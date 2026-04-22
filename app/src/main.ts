@@ -6,11 +6,7 @@ import {
 } from './game.js';
 import type { Card, Curriculum, GameState, Lesson } from './types.js';
 import { renderMarkdown } from './markdown.js';
-
-const CURRICULA: readonly { key: string; label: string }[] = [
-  { key: 'english', label: 'Anglais' },
-  { key: 'spanish', label: 'Espagnol' },
-];
+import { CURRICULA } from './curricula.js';
 
 const screenEl = document.querySelector<HTMLElement>('#screen')!;
 const scoreEl = document.querySelector<HTMLElement>('#score')!;
