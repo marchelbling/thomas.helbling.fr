@@ -144,6 +144,19 @@ function renderReview(title: string, cards: readonly Card[], notes?: string): vo
     v.className = 'review-value';
     v.textContent = card.value.join(' / ');
     row.append(k, sep, v);
+    if (tts) {
+      const listen = document.createElement('button');
+      listen.className = 'review-listen';
+      listen.type = 'button';
+      listen.textContent = '🔊';
+      listen.setAttribute('aria-label', 'Écouter');
+      const word = card.value[0]!;
+      listen.addEventListener('click', () => {
+        listen.disabled = true;
+        void tts!.speak(word).finally(() => { listen.disabled = false; });
+      });
+      v.append(' ', listen);
+    }
     if (card.note && card.note.trim() !== '') {
       const note = document.createElement('div');
       note.className = 'card-note';

@@ -135,6 +135,18 @@
     .review-key { text-align: right; color: #004170; font-weight: 600; }
     .review-sep { color: #9ca3af; }
     .review-value { text-align: left; color: #ed1c8f; font-weight: 600; }
+    .review-listen {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 0.25rem;
+      margin-left: 0.25rem;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+    }
+    .review-listen:hover { opacity: 1; }
+    .review-listen:disabled { opacity: 0.3; cursor: default; }
     .card-note {
       grid-column: 1 / -1;
       font-size: 0.9rem;
