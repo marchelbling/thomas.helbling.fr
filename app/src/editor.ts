@@ -10,6 +10,7 @@ interface EditCard {
 interface EditLesson {
   name: string;
   notes: string;
+  timeline: boolean;
   cards: EditCard[];
 }
 interface EditCurriculum {
@@ -54,8 +55,9 @@ function toRaw(s: EditCurriculum): RawCurriculum {
       if (c.note.trim() !== '') card.note = c.note;
       return card as RawCard;
     });
-    const lesson: { name: string; cards: RawCard[]; notes?: string } = { name: l.name, cards };
+    const lesson: { name: string; cards: RawCard[]; notes?: string; timeline?: boolean } = { name: l.name, cards };
     if (l.notes.trim() !== '') lesson.notes = l.notes;
+    if (l.timeline) lesson.timeline = true;
     return lesson as RawLesson;
   });
   const out: {
@@ -78,6 +80,7 @@ function fromRaw(raw: RawCurriculum): EditCurriculum {
     lessons: raw.lessons.map(l => ({
       name: l.name,
       notes: l.notes ?? '',
+      timeline: l.timeline ?? false,
       cards: l.cards.map(c => ({
         key: joinAliases(c.key),
         value: joinAliases(c.value),
@@ -240,7 +243,7 @@ function renderLessons(): HTMLElement {
   state.lessons.forEach((lesson, idx) => section.append(renderLesson(lesson, idx)));
   const addBtn = h('button', { type: 'button' }, ['+ Ajouter une leçon']);
   addBtn.addEventListener('click', () => {
-    state.lessons.push({ name: 'Nouvelle leçon', notes: '', cards: [] });
+    state.lessons.push({ name: 'Nouvelle leçon', notes: '', timeline: false, cards: [] });
     render();
   });
   section.append(addBtn);
@@ -272,6 +275,13 @@ function renderLesson(lesson: EditLesson, idx: number): HTMLElement {
   });
   header.append(nameInput, up, down, del);
   box.append(header);
+
+  const timelineToggle = h('input', { type: 'checkbox', checked: lesson.timeline });
+  timelineToggle.addEventListener('change', () => { lesson.timeline = timelineToggle.checked; });
+  box.append(h('label', { className: 'field inline' }, [
+    timelineToggle,
+    h('span', {}, ['Frise chronologique (les clés doivent être des dates : AAAA, AAAA-MM, AAAA-MM-JJ, « - » pour av. J.-C.)']),
+  ]));
 
   box.append(labeledTextarea(
     'Notes de la leçon (markdown + LaTeX $…$)',

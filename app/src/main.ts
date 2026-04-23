@@ -1,5 +1,5 @@
 import { TTS } from './tts.js';
-import { buildSession, loadCurriculum } from './data.js';
+import { buildSession, loadCurriculum, parseDate } from './data.js';
 import {
   addScore, advance, checkAnswer, createGame, current, isDone,
   markFailed, prompt,
@@ -85,7 +85,7 @@ function renderLessonPicker(): void {
     list.appendChild(lessonRow(
       lesson.name,
       () => startSession(lesson.cards),
-      () => renderReview(lesson.name, lesson.cards, lesson.notes),
+      () => renderReview(lesson.name, lesson.cards, lesson.notes, lesson.timeline ?? false),
     ));
   }
   screenEl.appendChild(list);
@@ -115,7 +115,7 @@ function lessonRow(name: string, onPlay: () => void, onReview: () => void): HTML
   return row;
 }
 
-function renderReview(title: string, cards: readonly Card[], notes?: string): void {
+function renderReview(title: string, cards: readonly Card[], notes?: string, timeline = false): void {
   clear();
   const h = document.createElement('h1');
   h.className = 'title';
@@ -129,9 +129,29 @@ function renderReview(title: string, cards: readonly Card[], notes?: string): vo
     screenEl.appendChild(notesEl);
   }
 
+  let definitions: readonly Card[] = cards;
+  if (timeline) {
+    const dated: { card: Card; serial: number }[] = [];
+    const rest: Card[] = [];
+    for (const c of cards) {
+      const s = parseDate(c.key[0]!);
+      if (s !== null) dated.push({ card: c, serial: s });
+      else rest.push(c);
+    }
+    dated.sort((a, b) => a.serial - b.serial);
+    if (dated.length > 0) screenEl.appendChild(renderTimelineSvg(dated));
+    definitions = rest;
+    if (rest.length > 0) {
+      const h2 = document.createElement('h2');
+      h2.className = 'review-subheading';
+      h2.textContent = 'Définitions';
+      screenEl.appendChild(h2);
+    }
+  }
+
   const table = document.createElement('div');
   table.className = 'review-list';
-  for (const card of cards) {
+  for (const card of definitions) {
     const row = document.createElement('div');
     row.className = 'review-row';
     const k = document.createElement('span');
@@ -172,6 +192,70 @@ function renderReview(title: string, cards: readonly Card[], notes?: string): vo
   back.textContent = '← Retour';
   back.addEventListener('click', renderLessonPicker);
   screenEl.appendChild(back);
+}
+
+function renderTimelineSvg(dated: readonly { card: Card; serial: number }[]): HTMLElement {
+  const wrap = document.createElement('div');
+  wrap.className = 'timeline';
+
+  const min = dated[0]!.serial;
+  const max = dated[dated.length - 1]!.serial;
+  const span = Math.max(1, max - min);
+
+  const rowH = 44;
+  const topPad = 20;
+  const botPad = 20;
+  const height = topPad + botPad + rowH * Math.max(1, dated.length - 1);
+  const width = 480;
+  const axisX = 90;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('class', 'timeline-svg');
+  svg.setAttribute('role', 'img');
+
+  // Main vertical axis.
+  const axis = document.createElementNS(svgNS, 'line');
+  axis.setAttribute('x1', String(axisX));
+  axis.setAttribute('x2', String(axisX));
+  axis.setAttribute('y1', String(topPad));
+  axis.setAttribute('y2', String(height - botPad));
+  axis.setAttribute('class', 'timeline-axis');
+  svg.appendChild(axis);
+
+  // Each dated card: dot, date label left, event label right.
+  // y position is proportional to date serial, so gaps are visible.
+  for (const { card, serial } of dated) {
+    const y = topPad + ((serial - min) / span) * (height - topPad - botPad);
+
+    const dot = document.createElementNS(svgNS, 'circle');
+    dot.setAttribute('cx', String(axisX));
+    dot.setAttribute('cy', String(y));
+    dot.setAttribute('r', '5');
+    dot.setAttribute('class', 'timeline-dot');
+    svg.appendChild(dot);
+
+    const dateLabel = document.createElementNS(svgNS, 'text');
+    dateLabel.setAttribute('x', String(axisX - 12));
+    dateLabel.setAttribute('y', String(y));
+    dateLabel.setAttribute('text-anchor', 'end');
+    dateLabel.setAttribute('dominant-baseline', 'middle');
+    dateLabel.setAttribute('class', 'timeline-date');
+    dateLabel.textContent = card.key[0]!;
+    svg.appendChild(dateLabel);
+
+    const eventLabel = document.createElementNS(svgNS, 'text');
+    eventLabel.setAttribute('x', String(axisX + 12));
+    eventLabel.setAttribute('y', String(y));
+    eventLabel.setAttribute('dominant-baseline', 'middle');
+    eventLabel.setAttribute('class', 'timeline-event');
+    eventLabel.textContent = card.value[0]!;
+    svg.appendChild(eventLabel);
+  }
+
+  wrap.appendChild(svg);
+  return wrap;
 }
 
 function startSession(cards: readonly Card[]): void {

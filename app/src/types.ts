@@ -10,6 +10,7 @@ export interface Lesson {
   readonly name: string;
   readonly cards: readonly Card[];
   readonly notes?: string;
+  readonly timeline?: boolean;
 }
 
 export interface Curriculum {
@@ -47,6 +48,7 @@ export interface RawLesson {
   readonly name: string;
   readonly cards: readonly RawCard[];
   readonly notes?: string;
+  readonly timeline?: boolean;
 }
 export interface RawCurriculum {
   readonly curriculum: string;
