@@ -5,39 +5,5 @@
   "voice": "es-ES",
   "piperVoice": "es_ES-sharvard-medium",
   "lessons": [
-    {
-      "name": "Lección 1",
-      "cards": [
-        {
-          "key": "chat",
-          "value": "gato"
-        },
-        {
-          "key": "chien",
-          "value": "perro"
-        },
-        {
-          "key": [
-            "bonjour",
-            "salut"
-          ],
-          "value": [
-            "hola"
-          ]
-        },
-        {
-          "key": "merci",
-          "value": "gracias"
-        },
-        {
-          "key": "oui",
-          "value": "sí"
-        },
-        {
-          "key": "non",
-          "value": "no"
-        }
-      ]
-    }
   ]
 }
