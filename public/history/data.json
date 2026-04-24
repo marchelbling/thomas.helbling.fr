@@ -1,33 +1,114 @@
 {
   "curriculum": "history",
   "label": "Histoire",
-  "audio": false,
   "lessons": [
     {
       "name": "Révolution française",
-      "timeline": true,
       "cards": [
-        { "key": "1789-05-05", "value": "Ouverture des États généraux" },
-        { "key": "1789-07-14", "value": "Prise de la Bastille" },
-        { "key": "1789-08-26", "value": "Déclaration des droits de l'homme et du citoyen" },
-        { "key": "1791-09-03", "value": "Première Constitution française" },
-        { "key": "1792-09-21", "value": "Proclamation de la République" },
-        { "key": "1793-01-21", "value": "Exécution de Louis XVI" },
-        { "key": "1794-07-27", "value": "Chute de Robespierre (9 Thermidor)" },
-        { "key": "1799-11-09", "value": "Coup d'État du 18 Brumaire" },
-        { "key": "sans-culottes", "value": "Révolutionnaires parisiens des milieux populaires" },
-        { "key": "Thermidor", "value": "Mois du calendrier révolutionnaire (juillet-août)" }
-      ]
+        {
+          "key": "1789-05-05",
+          "value": "Ouverture des États généraux"
+        },
+        {
+          "key": "1789-07-14",
+          "value": "Prise de la Bastille"
+        },
+        {
+          "key": "1789-08-26",
+          "value": "Déclaration des droits de l'homme et du citoyen"
+        },
+        {
+          "key": "1791-09-03",
+          "value": "Première Constitution française"
+        },
+        {
+          "key": "1792-09-21",
+          "value": "Proclamation de la République"
+        },
+        {
+          "key": "1793-01-21",
+          "value": "Exécution de Louis XVI"
+        },
+        {
+          "key": "1794-07-27",
+          "value": "Chute de Robespierre (9 Thermidor)"
+        },
+        {
+          "key": "1799-11-09",
+          "value": "Coup d'État du 18 Brumaire"
+        },
+        {
+          "key": "sans-culottes",
+          "value": "Révolutionnaires parisiens des milieux populaires"
+        },
+        {
+          "key": "Thermidor",
+          "value": "Mois du calendrier révolutionnaire (juillet-août)"
+        }
+      ],
+      "timeline": true
     },
     {
       "name": "Repères antiques",
-      "timeline": true,
       "cards": [
-        { "key": "-753", "value": "Fondation légendaire de Rome" },
-        { "key": "-509", "value": "Début de la République romaine" },
-        { "key": "-52", "value": "Bataille d'Alésia" },
-        { "key": "-27", "value": "Auguste devient premier empereur" },
-        { "key": "476", "value": "Chute de l'Empire romain d'Occident" }
+        {
+          "key": "-753",
+          "value": "Fondation légendaire de Rome"
+        },
+        {
+          "key": "-509",
+          "value": "Début de la République romaine"
+        },
+        {
+          "key": "-52",
+          "value": "Bataille d'Alésia"
+        },
+        {
+          "key": "-27",
+          "value": "Auguste devient premier empereur"
+        },
+        {
+          "key": "476",
+          "value": "Chute de l'Empire romain d'Occident"
+        }
+      ],
+      "timeline": true
+    },
+    {
+      "name": "Moyen-âge : définitions",
+      "cards": [
+        {
+          "key": "domaine royal",
+          "value": "partie du royaume qui appartient en propre au Roi et qu'il controle directement. Peu à peu le domaine royal correspond au territoire du royaume"
+        },
+        {
+          "key": "fief",
+          "value": "terre accordée par un suzerain à son vassal"
+        },
+        {
+          "key": "suzerain",
+          "value": "seigneur ayant des vassaux"
+        },
+        {
+          "key": "vassal",
+          "value": "seigneur qui prête hommage à un suzerain"
+        },
+        {
+          "key": "hommage",
+          "value": "cérémonie au cours de laquelle un vassal s'engage à servir un autre seigneur, le suzerain"
+        },
+        {
+          "key": "État monarchique",
+          "value": "territoire délimité par des frontières sur lequel il s'impose le pouvoir d'un Roi"
+        },
+        {
+          "key": "bailli",
+          "value": "représentant du Roi dans le royaume, chargé de rendre la justice et de lever les impôts"
+        },
+        {
+          "key": "sacre",
+          "value": "cérémonie religieuse par laquelle un Roi (ou un Empereur) reçoit symboliquement ses pouvoirs de Dieu"
+        }
       ]
     }
   ]
