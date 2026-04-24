@@ -130,7 +130,7 @@ function renderReview(title: string, cards: readonly Card[], notes?: string, tim
     editorLinkEl.href = url;
   }
   const h = document.createElement('h1');
-  h.className = 'title';
+  h.className = 'title review-title';
   h.textContent = title;
   screenEl.appendChild(h);
 
