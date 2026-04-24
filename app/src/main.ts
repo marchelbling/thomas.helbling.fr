@@ -131,15 +131,15 @@ function renderReview(title: string, cards: readonly Card[], notes?: string, tim
 
   let definitions: readonly Card[] = cards;
   if (timeline) {
-    const dated: { card: Card; serial: number }[] = [];
+    const dated: { card: Card; serial: number; year: number }[] = [];
     const rest: Card[] = [];
     for (const c of cards) {
-      const s = parseDate(c.key[0]!);
-      if (s !== null) dated.push({ card: c, serial: s });
+      const p = parseDate(c.key[0]!);
+      if (p !== null) dated.push({ card: c, serial: p.serial, year: p.year });
       else rest.push(c);
     }
     dated.sort((a, b) => a.serial - b.serial);
-    if (dated.length > 0) screenEl.appendChild(renderTimelineSvg(dated));
+    if (dated.length > 0) screenEl.appendChild(renderTimeline(dated));
     definitions = rest;
     if (rest.length > 0) {
       const h2 = document.createElement('h2');
@@ -194,67 +194,107 @@ function renderReview(title: string, cards: readonly Card[], notes?: string, tim
   screenEl.appendChild(back);
 }
 
-function renderTimelineSvg(dated: readonly { card: Card; serial: number }[]): HTMLElement {
+type BucketMode = 'year' | 'decade' | 'century';
+
+function bucketMode(span: number): BucketMode {
+  if (span <= 30) return 'year';
+  if (span <= 300) return 'decade';
+  return 'century';
+}
+
+// Century index: 1..N for AD (year 1..100 = century 1), -1..-N for BC, no 0.
+function centuryIdx(y: number): number {
+  return y > 0 ? Math.ceil(y / 100) : -Math.ceil(-y / 100);
+}
+
+function bucketIdx(mode: BucketMode, year: number): number {
+  if (mode === 'year') return year;
+  if (mode === 'decade') return Math.floor(year / 10);
+  return centuryIdx(year);
+}
+
+const ROMAN: readonly [number, string][] = [
+  [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+  [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+  [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+];
+function toRoman(n: number): string {
+  let s = '';
+  let r = Math.abs(n);
+  for (const [v, g] of ROMAN) { while (r >= v) { s += g; r -= v; } }
+  return s;
+}
+
+function bucketLabel(mode: BucketMode, idx: number): string {
+  if (mode === 'year') {
+    return idx < 0 ? `${-idx} av. J.-C.` : String(idx);
+  }
+  if (mode === 'decade') {
+    const start = Math.abs(idx) * 10;
+    return idx < 0 ? `Décennie ${start} av. J.-C.` : `Décennie ${start}`;
+  }
+  const era = idx < 0 ? 'av. J.-C.' : 'ap. J.-C.';
+  return `${toRoman(Math.abs(idx))}ᵉ siècle ${era}`;
+}
+
+// Separator label between previous-bucket `prev` and current-bucket `cur`
+// (cur > prev). If the two buckets are adjacent, label with the incoming
+// bucket; otherwise label with the range of skipped buckets, with 0 excluded
+// from century mode (there is no year 0 century).
+function separatorLabel(mode: BucketMode, prev: number, cur: number): string {
+  if (cur - prev === 1) return bucketLabel(mode, cur);
+  let from = prev + 1;
+  let to = cur - 1;
+  if (mode === 'century') {
+    if (from === 0) from = 1;
+    if (to === 0) to = -1;
+  }
+  if (from === to) return bucketLabel(mode, from);
+  return `${bucketLabel(mode, from)} – ${bucketLabel(mode, to)}`;
+}
+
+function renderTimeline(dated: readonly { card: Card; serial: number; year: number }[]): HTMLElement {
   const wrap = document.createElement('div');
   wrap.className = 'timeline';
 
-  const min = dated[0]!.serial;
-  const max = dated[dated.length - 1]!.serial;
-  const span = Math.max(1, max - min);
+  const span = Math.abs(dated[dated.length - 1]!.year - dated[0]!.year);
+  const mode = bucketMode(span);
 
-  const rowH = 44;
-  const topPad = 20;
-  const botPad = 20;
-  const height = topPad + botPad + rowH * Math.max(1, dated.length - 1);
-  const width = 480;
-  const axisX = 90;
+  let prevBucket: number | null = null;
+  for (const { card, year } of dated) {
+    const b = bucketIdx(mode, year);
+    if (prevBucket !== null && b !== prevBucket) {
+      const sep = document.createElement('div');
+      sep.className = 't-sep';
+      const line1 = document.createElement('span');
+      line1.className = 't-sep-line';
+      const label = document.createElement('span');
+      label.className = 't-sep-label';
+      label.textContent = separatorLabel(mode, prevBucket, b);
+      const line2 = document.createElement('span');
+      line2.className = 't-sep-line';
+      sep.append(line1, label, line2);
+      wrap.appendChild(sep);
+    }
+    prevBucket = b;
 
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(svgNS, 'svg');
-  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-  svg.setAttribute('class', 'timeline-svg');
-  svg.setAttribute('role', 'img');
-
-  // Main vertical axis.
-  const axis = document.createElementNS(svgNS, 'line');
-  axis.setAttribute('x1', String(axisX));
-  axis.setAttribute('x2', String(axisX));
-  axis.setAttribute('y1', String(topPad));
-  axis.setAttribute('y2', String(height - botPad));
-  axis.setAttribute('class', 'timeline-axis');
-  svg.appendChild(axis);
-
-  // Each dated card: dot, date label left, event label right.
-  // y position is proportional to date serial, so gaps are visible.
-  for (const { card, serial } of dated) {
-    const y = topPad + ((serial - min) / span) * (height - topPad - botPad);
-
-    const dot = document.createElementNS(svgNS, 'circle');
-    dot.setAttribute('cx', String(axisX));
-    dot.setAttribute('cy', String(y));
-    dot.setAttribute('r', '5');
-    dot.setAttribute('class', 'timeline-dot');
-    svg.appendChild(dot);
-
-    const dateLabel = document.createElementNS(svgNS, 'text');
-    dateLabel.setAttribute('x', String(axisX - 12));
-    dateLabel.setAttribute('y', String(y));
-    dateLabel.setAttribute('text-anchor', 'end');
-    dateLabel.setAttribute('dominant-baseline', 'middle');
-    dateLabel.setAttribute('class', 'timeline-date');
-    dateLabel.textContent = card.key[0]!;
-    svg.appendChild(dateLabel);
-
-    const eventLabel = document.createElementNS(svgNS, 'text');
-    eventLabel.setAttribute('x', String(axisX + 12));
-    eventLabel.setAttribute('y', String(y));
-    eventLabel.setAttribute('dominant-baseline', 'middle');
-    eventLabel.setAttribute('class', 'timeline-event');
-    eventLabel.textContent = card.value[0]!;
-    svg.appendChild(eventLabel);
+    const row = document.createElement('div');
+    row.className = 't-row';
+    const date = document.createElement('span');
+    date.className = 't-date';
+    date.textContent = card.key[0]!;
+    const axis = document.createElement('span');
+    axis.className = 't-axis';
+    const dot = document.createElement('span');
+    dot.className = 't-dot';
+    axis.appendChild(dot);
+    const event = document.createElement('span');
+    event.className = 't-event';
+    event.textContent = card.value[0]!;
+    row.append(date, axis, event);
+    wrap.appendChild(row);
   }
 
-  wrap.appendChild(svg);
   return wrap;
 }
 

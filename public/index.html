@@ -160,28 +160,63 @@
     .timeline {
       max-width: min(90vw, 40rem);
       width: 100%;
+      display: grid;
+      grid-template-columns: minmax(5rem, auto) 1.5rem 1fr;
+      column-gap: 0.75rem;
+      row-gap: 0;
     }
-    .timeline-svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      font-family: inherit;
+    .t-row {
+      display: contents;
     }
-    .timeline-axis {
-      stroke: #9ca3af;
-      stroke-width: 2;
-    }
-    .timeline-dot {
-      fill: #ed1c8f;
-    }
-    .timeline-date {
-      font-size: 12px;
+    .t-row > .t-date {
+      text-align: right;
       font-weight: 600;
-      fill: #004170;
+      color: #004170;
+      font-size: 0.95rem;
+      padding: 0.35rem 0;
+      white-space: nowrap;
+      align-self: center;
     }
-    .timeline-event {
-      font-size: 13px;
-      fill: #111827;
+    .t-row > .t-axis {
+      position: relative;
+      background: linear-gradient(#9ca3af, #9ca3af) center/2px 100% no-repeat;
+      min-height: 1.8rem;
+    }
+    .t-row > .t-axis > .t-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ed1c8f;
+    }
+    .t-row > .t-event {
+      padding: 0.35rem 0;
+      color: #111827;
+      font-size: 1rem;
+      align-self: center;
+      line-height: 1.35;
+    }
+    .t-sep {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+    }
+    .t-sep-line {
+      flex: 1;
+      height: 0;
+      border-top: 1px dashed #d1d5db;
+    }
+    .t-sep-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      font-variant: small-caps;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
     }
     .card-note {
       grid-column: 1 / -1;
