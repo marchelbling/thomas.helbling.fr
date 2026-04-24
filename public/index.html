@@ -288,6 +288,22 @@
       color: #6b7280;
     }
 
+    #exit {
+      position: fixed;
+      top: 0.75rem;
+      left: 1rem;
+    }
+
+    button.exit {
+      background: transparent;
+      color: #9ca3af;
+      font-size: 1.4rem;
+      font-weight: 400;
+      padding: 0.2rem 0.6rem;
+      line-height: 1;
+    }
+    button.exit:hover { background: #f3f4f6; color: #374151; }
+
     #progress {
       display: flex;
       flex-wrap: wrap;
@@ -322,6 +338,7 @@
 <body>
   <div id="screen"></div>
   <div id="score"></div>
+  <div id="exit"></div>
   <div id="progress"></div>
   <a href="editor/" class="editor-link">Éditeur</a>
 

@@ -10,6 +10,7 @@ import { CURRICULA } from './curricula.js';
 
 const screenEl = document.querySelector<HTMLElement>('#screen')!;
 const scoreEl = document.querySelector<HTMLElement>('#score')!;
+const exitEl = document.querySelector<HTMLElement>('#exit')!;
 const progressEl = document.querySelector<HTMLElement>('#progress')!;
 
 let tts: TTS | null = null;
@@ -21,6 +22,7 @@ let listenBtnEl: HTMLButtonElement | null = null;
 function clear(): void {
   screenEl.innerHTML = '';
   scoreEl.textContent = '';
+  exitEl.innerHTML = '';
   progressEl.innerHTML = '';
 }
 
@@ -371,6 +373,13 @@ function renderPrompt(): void {
   skip.addEventListener('click', handleSkip);
   controls.appendChild(skip);
   screenEl.appendChild(controls);
+
+  const exitBtn = document.createElement('button');
+  exitBtn.className = 'exit';
+  exitBtn.textContent = '✕';
+  exitBtn.title = 'Quitter la session';
+  exitBtn.addEventListener('click', () => { tts?.cancel(); renderLessonPicker(); });
+  exitEl.appendChild(exitBtn);
 
   scoreEl.textContent = `${state.score} / ${state.total}`;
   renderProgress();
