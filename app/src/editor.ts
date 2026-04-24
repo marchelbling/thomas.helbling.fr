@@ -161,7 +161,7 @@ function renderLessons(): HTMLElement {
   state.lessons.forEach((lesson, idx) => section.append(renderLesson(lesson, idx)));
   const addBtn = h('button', { type: 'button' }, ['+ Ajouter une leçon']);
   addBtn.addEventListener('click', () => {
-    state.lessons.push({ name: 'Nouvelle leçon', notes: '', timeline: false, cards: [] });
+    state.lessons.push({ name: 'Nouvelle leçon', notes: '', timeline: false, collapsed: false, cards: [] });
     render();
   });
   section.append(addBtn);
@@ -171,6 +171,9 @@ function renderLessons(): HTMLElement {
 function renderLesson(lesson: EditLesson, idx: number): HTMLElement {
   const box = h('div', { className: 'lesson-box' });
   const header = h('div', { className: 'lesson-header' });
+  const foldBtn = h('button', { type: 'button', className: 'small' }, [lesson.collapsed ? '▶' : '▼']);
+  foldBtn.title = lesson.collapsed ? 'Déplier' : 'Replier';
+  foldBtn.addEventListener('click', () => { lesson.collapsed = !lesson.collapsed; render(); });
   const nameInput = h('input', { type: 'text', value: lesson.name, className: 'lesson-name' });
   nameInput.addEventListener('input', () => { lesson.name = nameInput.value; });
   const up = h('button', { type: 'button', className: 'small' }, ['↑']);
@@ -191,8 +194,10 @@ function renderLesson(lesson: EditLesson, idx: number): HTMLElement {
     state.lessons.splice(idx, 1);
     render();
   });
-  header.append(nameInput, up, down, del);
+  header.append(foldBtn, nameInput, up, down, del);
   box.append(header);
+
+  if (lesson.collapsed) return box;
 
   const timelineToggle = h('input', { type: 'checkbox', checked: lesson.timeline });
   timelineToggle.addEventListener('change', () => { lesson.timeline = timelineToggle.checked; });
@@ -245,3 +250,19 @@ function renderFooter(): HTMLElement {
 }
 
 render();
+
+const params = new URLSearchParams(location.search);
+const autoKey = params.get('curriculum');
+if (autoKey) {
+  const lessonName = params.get('lesson');
+  void fetch(`/${autoKey}/data.json`, { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() as Promise<RawCurriculum>; })
+    .then(raw => {
+      Object.assign(state, fromRaw(raw));
+      if (lessonName) {
+        for (const l of state.lessons) l.collapsed = l.name !== lessonName;
+      }
+      render();
+    })
+    .catch(err => { alert('Chargement impossible : ' + (err as Error).message); });
+}

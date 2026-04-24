@@ -12,10 +12,12 @@ const screenEl = document.querySelector<HTMLElement>('#screen')!;
 const scoreEl = document.querySelector<HTMLElement>('#score')!;
 const exitEl = document.querySelector<HTMLElement>('#exit')!;
 const progressEl = document.querySelector<HTMLElement>('#progress')!;
+const editorLinkEl = document.querySelector<HTMLAnchorElement>('#editor-link')!;
 
 let tts: TTS | null = null;
 let state: GameState;
 let curriculum: Curriculum;
+let curriculumKey = '';
 let answerEl: HTMLInputElement | null = null;
 let listenBtnEl: HTMLButtonElement | null = null;
 
@@ -24,6 +26,8 @@ function clear(): void {
   scoreEl.textContent = '';
   exitEl.innerHTML = '';
   progressEl.innerHTML = '';
+  editorLinkEl.style.display = '';
+  editorLinkEl.href = 'editor/';
 }
 
 function renderCurriculumPicker(): void {
@@ -51,6 +55,7 @@ function renderCurriculumPicker(): void {
 
 async function pickCurriculum(key: string): Promise<void> {
   try {
+    curriculumKey = key;
     curriculum = await loadCurriculum(`./${key}/data.json`);
     tts = curriculum.audio && curriculum.voice
       ? new TTS(curriculum.voice, `./${key}/audio`)
@@ -87,7 +92,7 @@ function renderLessonPicker(): void {
     list.appendChild(lessonRow(
       lesson.name,
       () => startSession(lesson.cards),
-      () => renderReview(lesson.name, lesson.cards, lesson.notes, lesson.timeline ?? false),
+      () => renderReview(lesson.name, lesson.cards, lesson.notes, lesson.timeline ?? false, lesson.name),
     ));
   }
   screenEl.appendChild(list);
@@ -117,8 +122,13 @@ function lessonRow(name: string, onPlay: () => void, onReview: () => void): HTML
   return row;
 }
 
-function renderReview(title: string, cards: readonly Card[], notes?: string, timeline = false): void {
+function renderReview(title: string, cards: readonly Card[], notes?: string, timeline = false, lessonName?: string): void {
   clear();
+  if (curriculumKey) {
+    let url = `editor/?curriculum=${curriculumKey}`;
+    if (lessonName) url += `&lesson=${encodeURIComponent(lessonName)}`;
+    editorLinkEl.href = url;
+  }
   const h = document.createElement('h1');
   h.className = 'title';
   h.textContent = title;
@@ -330,6 +340,7 @@ function renderProgress(): void {
 
 function renderPrompt(): void {
   clear();
+  editorLinkEl.style.display = 'none';
   const entry = current(state);
   const isValuePrompt = entry.direction === 'value-to-key';
 

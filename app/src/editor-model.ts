@@ -10,6 +10,7 @@ export interface EditLesson {
   notes: string;
   timeline: boolean;
   cards: EditCard[];
+  collapsed: boolean;
 }
 export interface EditCurriculum {
   curriculum: string;
@@ -77,6 +78,7 @@ export function fromRaw(raw: RawCurriculum): EditCurriculum {
       name: l.name,
       notes: l.notes ?? '',
       timeline: l.timeline ?? false,
+      collapsed: false,
       cards: l.cards.map(c => ({
         key: joinAliases(c.key),
         value: joinAliases(c.value),
